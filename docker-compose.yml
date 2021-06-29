@@ -2,7 +2,7 @@ version: '3.2'
 
 services:
   elasticsearch:
-#    image: elasticsearch/elasticsearch:7.10.2
+    container_name: "elasticsearch"
     build:
       context: elasticsearch/
       args:
@@ -12,15 +12,18 @@ services:
         source: ./elasticsearch/config/elasticsearch.yml
         target: /usr/share/elasticsearch/config/elasticsearch.yml
         read_only: true
-      - type: volume
-        source: elasticsearch
+#      - type: volume
+#        source: elasticsearch
+      - type: bind
+        source: ./data/elasticsearch-data
         target: /usr/share/elasticsearch/data
     ports:
       - "9200:9200"
       - "9300:9300"
     environment:
       ES_JAVA_OPTS: "-Xmx256m -Xms256m"
-      ELASTIC_PASSWORD: changeme
+      ELASTIC_USERNAME: $USERNAME
+      ELASTIC_PASSWORD: $PASSWORD
       # Use single node discovery in order to disable production mode and avoid bootstrap checks.
       # see: https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html
       discovery.type: single-node
@@ -54,6 +57,7 @@ services:
 #      - elasticsearch
 
   kibana:
+    container_name: "kibana"
     build:
       context: kibana/
       args:
